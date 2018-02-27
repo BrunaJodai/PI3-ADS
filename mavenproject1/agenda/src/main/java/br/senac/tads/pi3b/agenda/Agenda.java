@@ -5,8 +5,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,7 +29,8 @@ public class Agenda {
         return conn;
     }
 
-    public void listar() throws ClassNotFoundException, SQLException {
+    public List<Pessoa> listar() throws ClassNotFoundException, SQLException {
+        List<Pessoa> lista = new ArrayList<Pessoa>();
 
         //abrir conexao com bd
         //declarar o drive jdbc de acordo com o bd usado
@@ -39,31 +42,46 @@ public class Agenda {
                 String nome = resultados.getString("nome");
                 Date dtnasc = resultados.getDate("dtnasc");
 
-                System.out.println(id + ", " + nome + ", " + dtnasc);
+                Pessoa p = new Pessoa();
+                p.setId(id);
+                p.setNome(nome);
+                p.setDtNasc(dtnasc);
+
+                lista.add(p);
+
+                //System.out.println(id + ", " + nome + ", " + dtnasc);
             }
 
         }
 
+        return lista;
+
     }
 
     public void incluir() throws ClassNotFoundException, SQLException {
-        try (Connection conn = obterConexao(); 
-            PreparedStatement stmt = conn.prepareStatement("INSERT INTO agenda.PESSOA (nome, dtnasc) VALUES (?, ?)")){
+        try (Connection conn = obterConexao();
+                PreparedStatement stmt = conn.prepareStatement("INSERT INTO agenda.PESSOA (nome, dtnasc) VALUES (?, ?)")) {
             stmt.setString(1, "Jonas Ribeiro");
             GregorianCalendar cal = new GregorianCalendar(1995, 10, 11);
             stmt.setDate(2, new java.sql.Date(cal.getTimeInMillis()));
-            
+
             int status = stmt.executeUpdate();
-            
-            System.out.println("status: " +status);
+
+            System.out.println("status: " + status);
         }
     }
 
     public static void main(String[] args) {
         Agenda agenda = new Agenda();
         try {
-            agenda.listar();
-            agenda.incluir();
+            //agenda.incluir();
+
+            List<Pessoa> lista = agenda.listar();
+
+            for (Pessoa p : lista) {
+                System.out.println(p.getId() + " - " + p.getNome() + " - " + p.getDtNasc());
+            }
+
         } catch (ClassNotFoundException ex) {
             System.err.println(ex.getMessage());
         } catch (SQLException ex) {
