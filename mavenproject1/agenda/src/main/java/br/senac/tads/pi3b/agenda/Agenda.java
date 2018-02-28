@@ -103,7 +103,7 @@ public class Agenda {
                     conn.commit();
                 }
             } catch (SQLException e) {
-                //em caso de erro, volta para a comparação inicial
+                //em caso de erro, volta para a situação inicial
                 conn.rollback();
                 throw e;
             }
